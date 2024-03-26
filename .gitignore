@@ -1,3 +1,6 @@
+# Project specific
+notebooks/nb_paths.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

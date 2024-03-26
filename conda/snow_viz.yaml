@@ -2,6 +2,7 @@ name: snow_viz
 channels:
 - conda-forge
 dependencies:
+- asyncssh
 - dask
 - flox
 - geopandas

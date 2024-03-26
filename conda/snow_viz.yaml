@@ -1,0 +1,16 @@
+name: snow_viz
+channels:
+- conda-forge
+dependencies:
+- dask
+- flox
+- geopandas
+- geoviews
+- holoviews
+- hvplot
+- ipykernel
+- matplotlib
+- netcdf4
+- rasterio
+- xarray
+

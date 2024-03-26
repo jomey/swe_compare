@@ -1,0 +1,9 @@
+name: jupyter-lab
+channels:
+- conda-forge
+dependencies:
+- git
+- ipywidgets
+- jupyterlab
+- jupyterlab_vim
+- nodejs

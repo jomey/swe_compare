@@ -10,9 +10,9 @@ BOKEH_OPTS = dict(
     cmap='viridis',
 )
 
-# Interactive HTML pages
-import panel as pn
-from bokeh.resources import INLINE
+hv.plotting.bokeh.ElementPlot.active_tools = [
+    'save', 'pan', 'box_zoom', 'reset'
+]
 
 # Jupyter Lab has missing PROJ envs
 import os

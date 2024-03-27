@@ -1,5 +1,8 @@
 import holoviews as hv
 import pandas as pd
+import panel as pn
+
+from bokeh.resources import INLINE
 
 class ZoneCompare:
     def __init__(self, target_zones, cbrfc_swe, swann_swe, year_range):
@@ -42,3 +45,20 @@ class ZoneCompare:
             swann_data.hvplot('time', label=f'SWANN')
         ])
         return hv.Layout(time_series + scatter).cols(1)
+
+
+    def show_all(self):
+        plots = [self.plot_panels(zone) for zone in self.target_zones.keys()]
+        return hv.Layout(plots).opts(shared_axes=False).cols(2)
+
+
+    def save_html(self, file_path):
+        """
+        Save plots as interactive HTML page
+        """
+        pn.pane.HoloViews(
+            self.show_all()
+        ).save(
+            file_path, embed=True, resources=INLINE
+        )
+

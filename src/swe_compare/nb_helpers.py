@@ -1,6 +1,7 @@
 import logging
 from dask.distributed import Client, SSHCluster
 
+
 def start_cluster(n_workers=10, memory_limit='4GB', local=True):
     if local:
         cluster = Client(
@@ -27,7 +28,6 @@ def start_cluster(n_workers=10, memory_limit='4GB', local=True):
             }
         )
         cluster = Client(ssh_cluster)
-        
+
     print(cluster.dashboard_link)
     return cluster
-

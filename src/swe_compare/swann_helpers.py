@@ -38,12 +38,16 @@ def swann_swe_for_zones(
     cbrfc_zone_shape,
     target_zones_dict,
 ):
-    target_cbrfc_zones = cbrfc_zone_mask_as_xr(cbrfc_zone_tif, cbrfc_zone_shape)
+    target_cbrfc_zones = cbrfc_zone_mask_as_xr(
+        cbrfc_zone_tif, cbrfc_zone_shape
+    )
+
     # Reduce to zones of interest
     target_cbrfc_zones = target_cbrfc_zones.where(
         target_cbrfc_zones.isin(list(target_zones_dict.values())),
         drop=True
     )
+
     # Get SWE values for bounding box of target zones
     swann = xr.open_mfdataset(swann_files, parallel=True).sel(
         target_bounding_box(target_cbrfc_zones)
@@ -56,7 +60,6 @@ def swann_swe_for_zones(
     )
 
     swann_cbrfc_zones = combine_cbrfc_swann(swann, target_cbrfc_zones)
-
 
     return swann_cbrfc_zones.where(
         swann_cbrfc_zones.zone.isin(

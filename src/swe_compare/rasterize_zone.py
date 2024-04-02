@@ -7,6 +7,7 @@ from shapely.geometry import mapping
 
 MASK_NO_ZONE = -999
 
+
 def cbrfc_zone_mask(zone_raster, zone_shape):
     with rasterio.open(zone_raster) as zone_tif:
         transform = zone_tif.transform
@@ -28,6 +29,7 @@ def cbrfc_zone_mask(zone_raster, zone_shape):
         fill=MASK_NO_ZONE,
         dtype=rasterio.int16
     )
+
 
 def zone_tif_lons_lats(zone_raster_file):
     with rasterio.open(zone_raster_file) as zone_raster:

@@ -4,6 +4,7 @@ import panel as pn
 
 from bokeh.resources import INLINE
 
+
 class ZoneCompare:
     def __init__(self, target_zones, cbrfc_swe, swann_swe, year_range):
         self.target_zones = target_zones
@@ -13,17 +14,18 @@ class ZoneCompare:
             [f'{year}-03-01' for year in year_range]
         )
 
-
     def plot_panels(self, name):
         zone_ID = self.target_zones[name]
-        axes_limits=(-20, 1000)
+        axes_limits = (-20, 1000)
 
         swann_data = self.swann_swe.sel(zone=zone_ID)
 
         snow_17_m1 = self.cbrfc_swe.loc[self.year_range][name].values
         swann_m1 = swann_data.loc[self.year_range].values
 
-        correlation = str(f'{pd.Series(snow_17_m1).corr(pd.Series(swann_m1)):.3}')
+        correlation = str(
+            f'{pd.Series(snow_17_m1).corr(pd.Series(swann_m1)):.3}'
+        )
 
         scatter = hv.Overlay([
             hv.Slope(1, 0).opts(color='orange'),
@@ -46,11 +48,9 @@ class ZoneCompare:
         ])
         return hv.Layout(time_series + scatter).cols(1)
 
-
     def show_all(self):
         plots = [self.plot_panels(zone) for zone in self.target_zones.keys()]
         return hv.Layout(plots).opts(shared_axes=False).cols(2)
-
 
     def save_html(self, file_path):
         """
@@ -61,4 +61,3 @@ class ZoneCompare:
         ).save(
             file_path, embed=True, resources=INLINE
         )
-

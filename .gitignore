@@ -1,6 +1,10 @@
 # Project specific
 notebooks/nb_paths.py
 
+# DBeaver
+.project
+.dbeaver
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

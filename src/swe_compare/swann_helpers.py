@@ -1,31 +1,66 @@
+import math
+import numpy as np
 import xarray as xr
 
 from .rasterize_zone import cbrfc_zone_mask_as_xr
 
 
-def combine_cbrfc_swann(swann_files, cbrfc_zones):
+def target_bounding_box(target_zones):
+    lon_box = slice(
+        math.floor(target_zones.lon.values.min()),
+        math.ceil(target_zones.lon.values.max())
+    )
+    lat_box = slice(
+        math.floor(target_zones.lat.values.min()),
+        math.ceil(target_zones.lat.values.max())
+    )
+    return dict(lat=lat_box, lon=lon_box)
+
+
+def combine_cbrfc_swann(swann, cbrfc_zones):
     """
-        Combines CBRFC mask with SWANN SWE and 
+        Combines CBRFC mask with SWANN SWE and
         computes the CBRFC zonal mean.
     """
     return xr.combine_by_coords(
         [
-            xr.open_mfdataset(swann_files, parallel=True),
-            cbrfc_zones
-        ], 
-        coords=['lat', 'lon'], 
-        join='override'
+            cbrfc_zones,
+            swann,
+        ],
+        coords=['lat', 'lon'],
+        join='inner'
     ).groupby('zone').mean()
 
 
 def swann_swe_for_zones(
-    swann_files, 
+    swann_files,
     cbrfc_zone_tif,
     cbrfc_zone_shape,
-    target_zones_dict
+    target_zones_dict,
 ):
-    cbrfc_zones = cbrfc_zone_mask_as_xr(cbrfc_zone_tif, cbrfc_zone_shape)
-    swann_cbrfc_zones = combine_cbrfc_swann(swann_files, cbrfc_zones)
+    target_cbrfc_zones = cbrfc_zone_mask_as_xr(
+        cbrfc_zone_tif, cbrfc_zone_shape
+    )
+
+    # Reduce to zones of interest
+    target_cbrfc_zones = target_cbrfc_zones.where(
+        target_cbrfc_zones.isin(list(target_zones_dict.values())),
+        drop=True
+    )
+
+    # Get SWE values for bounding box of target zones
+    swann = xr.open_mfdataset(swann_files, parallel=True).sel(
+        target_bounding_box(target_cbrfc_zones)
+    )
+
+    swann = swann.interp(
+        lat=target_cbrfc_zones.lat.values,
+        lon=target_cbrfc_zones.lon.values,
+        method='nearest'
+    )
+
+    swann_cbrfc_zones = combine_cbrfc_swann(swann, target_cbrfc_zones)
+
     return swann_cbrfc_zones.where(
         swann_cbrfc_zones.zone.isin(
             list(target_zones_dict.values())

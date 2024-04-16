@@ -1,4 +1,3 @@
-import logging
 from dask.distributed import Client, SSHCluster
 
 

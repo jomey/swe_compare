@@ -39,10 +39,12 @@ Database query class.
         Row
             Query result as psycopg row.
         """
-        with self.connection as connection:
-            with connection.cursor() as curs:
-                curs.execute(query, params)
-                return curs.fetchone()
+        # TODO: Figure out a good way to close and open connections
+        #       Keeping this open for now which can be problematic with man
+        #       class instances at once.
+        with self.connection.cursor() as curs:
+            curs.execute(query, params)
+            return curs.fetchone()
 
     def zone_as_rio(self, zone_name: str) -> MemoryFile:
         """

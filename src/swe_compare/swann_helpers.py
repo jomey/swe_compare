@@ -2,6 +2,8 @@ import math
 import xarray as xr
 
 from .rasterize_zone import cbrfc_zone_mask_as_xr
+from .zone_db import ZoneDB
+from .zone_raster import ZoneRaster
 
 
 def target_bounding_box_padded(target_zones: xr.Dataset) -> dict:
@@ -86,3 +88,40 @@ def swann_swe_for_zones(
             list(target_zones_dict.values())
         ), drop=True
     ).SWE.compute()
+
+
+def swann_data_for_zone(
+        swann_files: xr.Dataset, zone_name: str, zone_db: ZoneDB
+) -> xr.DataArray:
+    """
+    Retrieve the data for requested zone from given SWANN files and calculate
+    daily means.
+
+    This uses the database to get the CBRFC zone mask and then applies
+    it to the files as a mask.
+
+    Parameters
+    ----------
+    swann_files : xr.Dataset
+        Xarray Dataset with all SWE files to extract data from
+    zone_name : str
+        CBRFC zone to get data for
+    zone_db : ZoneDB
+        Instance that holds the database connection
+
+    Returns
+    -------
+    xr.DataArray
+        Results as xarray DataArray.
+    """
+    zone_mask = zone_db.zone_as_rio(zone_name)
+    swann_xr = swann_files.sel(
+        ZoneRaster.bounding_box(zone_mask)
+    )
+
+    # Apply mask as new coordinate
+    swann_xr.coords['mask'] = (
+        ('lat', 'lon'), ZoneRaster.data_as_xr(zone_mask)
+    )
+
+    return swann_xr.where(swann_xr.mask == 1).mean(['lat', 'lon']).compute()

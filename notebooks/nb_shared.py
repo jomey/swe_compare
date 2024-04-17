@@ -1,3 +1,5 @@
+import xarray as xr
+
 # Plotting
 import holoviews as hv
 import hvplot.xarray

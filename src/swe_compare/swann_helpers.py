@@ -1,11 +1,26 @@
 import math
-import numpy as np
 import xarray as xr
 
 from .rasterize_zone import cbrfc_zone_mask_as_xr
 
 
-def target_bounding_box(target_zones):
+def target_bounding_box_padded(target_zones: xr.Dataset) -> dict:
+    """
+    Get bounding box for Xarray dataset.
+
+    Assumes that the coordinates are labeled as lon/lat. The coordinates
+    are also rounded to add padding.
+
+    Parameters
+    ----------
+    target_zones : xr.Dataset
+        Dataset to extract bounding box from.
+
+    Returns
+    -------
+    dict
+        Dictionary containing the lat and lon as keys.
+    """
     lon_box = slice(
         math.floor(target_zones.lon.values.min()),
         math.ceil(target_zones.lon.values.max())
@@ -19,8 +34,8 @@ def target_bounding_box(target_zones):
 
 def combine_cbrfc_swann(swann, cbrfc_zones):
     """
-        Combines CBRFC mask with SWANN SWE and
-        computes the CBRFC zonal mean.
+    Combines CBRFC mask with SWANN SWE and
+    computes the CBRFC zonal mean.
     """
     return xr.combine_by_coords(
         [
@@ -38,6 +53,11 @@ def swann_swe_for_zones(
     cbrfc_zone_shape,
     target_zones_dict,
 ):
+    """
+    Mask SWANN SWE with given CBRFC zone Tif and list of
+    targeted zones.
+    """
+
     target_cbrfc_zones = cbrfc_zone_mask_as_xr(
         cbrfc_zone_tif, cbrfc_zone_shape
     )
@@ -50,7 +70,7 @@ def swann_swe_for_zones(
 
     # Get SWE values for bounding box of target zones
     swann = xr.open_mfdataset(swann_files, parallel=True).sel(
-        target_bounding_box(target_cbrfc_zones)
+        target_bounding_box_padded(target_cbrfc_zones)
     )
 
     swann = swann.interp(

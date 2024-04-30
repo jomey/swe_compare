@@ -4,6 +4,7 @@ notebooks/nb_paths.py
 # DBeaver
 .project
 .dbeaver
+dbeaver/Scripts/Script.sql
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

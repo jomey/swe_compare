@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION public.mask_for_zone(zone_name text)
  LANGUAGE sql
 AS $function$
     WITH cbrfc_zone AS (
-        select geom from cbrfc_zones_uc czu where zone = zone_name
+        select geom from cbrfc_zones czu where zone = zone_name
     ),
     zone_buffer AS (
         SELECT st_buffer(st_envelope(cbrfc_zone.geom), 0.05) AS geom FROM cbrfc_zone

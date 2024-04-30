@@ -12,6 +12,6 @@ dependencies:
 - ipykernel
 - matplotlib
 - netcdf4
+- psycopg
 - rasterio
 - xarray
-

@@ -1,8 +1,8 @@
 import xarray as xr
 
-from swe_compare.nb_helpers import start_cluster
-from swe_compare import Snow17SWE, ZoneCompare, ZoneDB
-from swe_compare.swann_helpers import swann_data_for_zone
+from swed_17.nb_helpers import start_cluster
+from swed_17 import Snow17SWE, ZoneCompare, ZoneDB
+from swed_17.swann_helpers import swann_data_for_zone
 
 # Plotting
 import holoviews as hv

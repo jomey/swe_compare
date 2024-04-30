@@ -22,3 +22,8 @@ ALTER TABLE cbrfc_zones ALTER COLUMN region SET NOT NULL;
 
 DROP TABLE cbrfc_zones_uc;
 DROP TABLE cbrfc_zones_gsl;
+
+CREATE INDEX zone_idx ON cbrfc_zones(zone);
+CREATE INDEX ch5_id_idx ON cbrfc_zones(ch5_id);
+
+ALTER TABLE cbrfc_zones RENAME COLUMN descriptoi TO description;

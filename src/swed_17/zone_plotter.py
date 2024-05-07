@@ -28,7 +28,9 @@ class ZonePlotter:
         return hv.Layout(collection).opts(shared_axes=False).cols(2)
 
     @classmethod
-    def save_html(cls, file_path: str, collection: list) -> None:
+    def save_html(
+        cls, file_path: str, collection: list, two_cols: bool = True
+    ) -> None:
         """
         Save plots as interactive HTML page
 
@@ -38,10 +40,16 @@ class ZonePlotter:
             Path to save files to
         collection : list
             Collection of ZoneCompare instances
+        two_cols : bool
+            Indicate plot layout. 'True' creates two columns (Default) and
+            'False' has one.
         """
 
+        if two_cols:
+            collection = cls.show_all(collection)
+
         pn.pane.HoloViews(
-            cls.show_all(collection)
+            collection
         ).save(
             file_path, embed=True, resources=INLINE
         )

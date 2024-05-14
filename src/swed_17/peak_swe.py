@@ -113,3 +113,31 @@ def plot_peak_swe_pd(swe_data: pd.DataFrame, title: str = '') -> hv.Overlay:
         width=900,
         height=600,
     )
+
+
+def compare_peak_swe(
+        cbrfc_swe: pd.DataFrame, swann_swe: dict
+) -> list:
+    """Create comparison plot for peak SWE dates in given dataframes.
+
+    The cbrfc_swe column names will be used to match the key in swann_swe
+    dictionary.
+
+    Parameters
+    ----------
+    cbrfc_swe : pd.DataFrame
+        Peak SWE dates for CBRFC
+    swann_swe : dict
+        Peak SWE dates for SWANN zones.
+
+    Returns
+    -------
+    list
+        Holoviews overlays for each zone
+    """
+    return [
+        plot_peak_swe_pd(
+            cbrfc_swe[key].to_frame().join(swann_swe[key]),
+            "Peak SWE - " + key
+        ) for key in cbrfc_swe.columns.values
+    ]

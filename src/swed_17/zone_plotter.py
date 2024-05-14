@@ -9,9 +9,9 @@ class ZonePlotter:
     Utility class for plotting and export to HTML pages
     """
     @classmethod
-    def show_all(cls, collection: list) -> hv.Layout:
+    def show_all(cls, collection: list, columns: int = 2) -> hv.Layout:
         """
-        Show given collection in one layout with two columns.
+        Show given collection in one layout with given columns number.
 
         For use in notebooks.
 
@@ -19,17 +19,19 @@ class ZonePlotter:
         ----------
         collection : list
             Collection of Holoview plots
+        columns: int
+            Number of columns in the layout. (Default: 2)
 
         Returns
         -------
         hv.Layout
             Holoviews layout with all plots in two columns
         """
-        return hv.Layout(collection).opts(shared_axes=False).cols(2)
+        return hv.Layout(collection).opts(shared_axes=False).cols(columns)
 
     @classmethod
     def save_html(
-        cls, file_path: str, collection: list, two_cols: bool = True
+        cls, file_path: str, collection: list, columns: int = 2
     ) -> None:
         """
         Save plots as interactive HTML page
@@ -40,13 +42,11 @@ class ZonePlotter:
             Path to save files to
         collection : list
             Collection of ZoneCompare instances
-        two_cols : bool
-            Indicate plot layout. 'True' creates two columns (Default) and
-            'False' has one.
+        columns : int
+            Number of columns in the layout.
         """
 
-        if two_cols:
-            collection = cls.show_all(collection)
+        collection = cls.show_all(collection, columns)
 
         pn.pane.HoloViews(
             collection

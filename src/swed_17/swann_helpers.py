@@ -1,9 +1,14 @@
 import math
+import pandas as pd
 import xarray as xr
 
+from .peak_swe import peak_swe_for_pd
 from .rasterize_zone import cbrfc_zone_mask_as_xr
 from .zone_db import ZoneDB
 from .zone_raster import ZoneRaster
+
+
+SWANN_SUFFIX = '_SWANN'
 
 
 def target_bounding_box_padded(target_zones: xr.Dataset) -> dict:
@@ -125,3 +130,63 @@ def swann_data_for_zone(
     )
 
     return swann_xr.where(swann_xr.mask == 1).mean(['lat', 'lon']).compute()
+
+
+def swann_swe_for_zone(
+        swann_xr: xr.Dataset, zone_name: str, zone_db: ZoneDB
+) -> pd.DataFrame:
+    """Get SWE data from SWANN xarray dataset and return as dataframe.
+
+    Uses the :meth:`swann_data_for_zone` to retrieve SWANN data.
+
+    Parameters
+    ----------
+    swann_xr : xr.Dataset
+        Dataset with all SWANN files
+    zone_name : str
+        Zone name to extract data for.
+    zone_db : ZoneDB
+        Connection object to the database
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with dates of peak SWE by year.
+    """
+    zone_df = swann_data_for_zone(
+        swann_xr, zone_name, zone_db
+    ).SWE.to_dataframe()
+
+    zone_df = zone_df.rename(columns={'SWE': zone_name + SWANN_SUFFIX})
+
+    return zone_df
+
+
+def peak_swe_for_swann(
+        swann_xr: xr.Dataset, target_zones: list, zone_db: ZoneDB
+) -> dict:
+    """Generate peak SWE date time series for given zone
+
+    Parameters
+    ----------
+    swann_xr : xr.Dataset
+        Dataset containing all files with SWE data
+    target_zones : list
+        List of zones to extract from SWE data
+    zone_db : ZoneDB
+        Connection object to the database
+
+    Returns
+    -------
+    dict
+        Dictionary with keys as zone names and values with the data.
+    """
+    swann_swe = {
+        zone_name: swann_swe_for_zone(swann_xr, zone_name, zone_db)
+        for zone_name in target_zones
+    }
+
+    return {
+        zone_name: peak_swe_for_pd(swann_swe[zone_name])
+        for zone_name in target_zones
+    }

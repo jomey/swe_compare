@@ -52,7 +52,9 @@ def peak_swe_for_zone(
     return peaks
 
 
-def peak_swe_for_pd(swe_data: pd.DataFrame) -> pd.DataFrame:
+def peak_swe_for_pd(
+        swe_data: pd.DataFrame, modify_date: bool = True
+) -> pd.DataFrame:
     """
     Get the date of peak SWE for each zone in the Dataframe.
 
@@ -63,6 +65,9 @@ def peak_swe_for_pd(swe_data: pd.DataFrame) -> pd.DataFrame:
     ----------
     swe_data : pd.DataFrame
         Data to search through
+    modify_date : bool
+        Wether to create a uniform year in all dates to easier compare the dates
+        (Default: True)
 
     Returns
     -------
@@ -80,7 +85,9 @@ def peak_swe_for_pd(swe_data: pd.DataFrame) -> pd.DataFrame:
     })
 
     for zone in swe_data.columns.values:
-        peak_swe[zone] = peak_swe_for_zone(swe_data, zone, year_range)
+        peak_swe[zone] = peak_swe_for_zone(
+            swe_data, zone, year_range, modify_date
+        )
 
     peak_swe = peak_swe.set_index('year')
 

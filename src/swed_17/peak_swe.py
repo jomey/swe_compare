@@ -11,13 +11,17 @@ from bokeh.models import DatetimeTickFormatter, HoverTool
 
 
 def peak_swe_for_zone(
-        swe_data: pd.DataFrame, zone: str, year_range: range
+        swe_data: pd.DataFrame,
+        zone: str,
+        year_range: range,
+        modify_date: bool = True
 ) -> list:
     """
     Get the date of peak SWE from a Dataframe and in given zone and year range.
 
-    The year of each date will be changed to be 1880 to be able to compare each
-    year. To get the actual year of the value, use the Dataframe index.
+    If indicated, the year of each date will be changed to be 1880 to be able
+    to compare each year. The actual year the value will remain in the
+    Dataframe index.
 
     Parameters
     ----------
@@ -27,6 +31,9 @@ def peak_swe_for_zone(
         CBRFC zone name
     year_range : range
         Year range to get dates for
+    modify_date : bool
+        Wether to create a uniform year in all dates to easier compare the dates
+        (Default: True)
 
     Returns
     -------
@@ -38,8 +45,11 @@ def peak_swe_for_zone(
         for year in year_range
     ]
 
-    # Modify each year to the leap year in 1880
-    return [date.replace(year=1880) for date in peaks]
+    if modify_date:
+        # Modify each year to the leap year in 1880
+        return [date.replace(year=1880) for date in peaks]
+
+    return peaks
 
 
 def peak_swe_for_pd(swe_data: pd.DataFrame) -> pd.DataFrame:

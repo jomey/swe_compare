@@ -158,6 +158,9 @@ def swann_swe_for_zone(
     ).SWE.to_dataframe()
 
     zone_df = zone_df.rename(columns={'SWE': zone_name + SWANN_SUFFIX})
+    # Pandas uses a time index that accounts for nano-leapseconds
+    # Rounding to the nearest day.
+    zone_df.index = zone_df.index.round('D')
 
     return zone_df
 
